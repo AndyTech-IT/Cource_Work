@@ -7,7 +7,16 @@
 struct PartConnector
 {
 	Part* Main = NULL;
-	Part* Connected = NULL;
+	bool Visited = false;
+	PartConnector* Connected = NULL;
 	Point2 Position = Point2();
+	Point2 Connected_Position = Point2();
+	int Index = 0;
+
+	PartConnector();
+	PartConnector(const PartConnector& value);
+	PartConnector(const PartConnector* value);
+	PartConnector(Point2 position, Point2 con_position);
+	~PartConnector();
 };
 

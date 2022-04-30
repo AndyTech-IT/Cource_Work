@@ -12,5 +12,15 @@ struct Point2
 	{
 		return COORD{ (short)X, (short)Y };
 	}
+	operator const SMALL_RECT*()
+	{
+		const SMALL_RECT result = SMALL_RECT{ 0, 0, (short)X, (short)Y };
+		return &result;
+	}
+	Point2 operator +(Point2 value);
+	Point2 operator -(Point2 value);
+	Point2 operator -();
+	bool operator ==(Point2 value);
+	bool operator !=(Point2 value);
 };
 

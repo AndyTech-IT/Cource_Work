@@ -10,6 +10,7 @@
 #include <conio.h>
 #include <stdio.h>
 #include <iostream>
+#include <shobjidl.h> 
 using namespace std;
 
 #endif
@@ -20,7 +21,9 @@ using namespace std;
 struct Point2;
 enum class Color;
 struct Part;
-struct PartConnector;
+struct PartConnector; 
+struct Window_Args;
+enum class Part_Type;
 
 #endif
 

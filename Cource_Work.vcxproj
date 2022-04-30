@@ -151,6 +151,7 @@
     <ClInclude Include="Part.h" />
     <ClInclude Include="PartConnector.h" />
     <ClInclude Include="Point2.h" />
+    <ClInclude Include="Window_Args.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
