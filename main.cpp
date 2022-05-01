@@ -7,18 +7,6 @@
 
 HANDLE cons = GetStdHandle(STD_OUTPUT_HANDLE);
 
-#define Is_UpKey(key_code) key_code == 72 || key_code == 119 || key_code == 56 || key_code == -26
-#define Is_LeftKey(key_code) key_code == 75 || key_code == 97 || key_code == 52 || key_code == -27
-#define Is_DownKey(key_code) key_code == 80 || key_code == 115 || key_code == 50 || key_code == -21
-#define Is_RightKey(key_code) key_code == 77 || key_code == 100 || key_code == 54 || key_code == -94
-#define Is_AcceptKey(key_code) key_code == 13 || key_code == 32 || key_code == 53
-#define Is_CancelKey(key_code) key_code == 27 ||  key_code == 8
-#define Is_DeleteKey(key_code) key_code == 83 ||  key_code == 120 ||  key_code == -25
-#define Is_CopyKey(key_code) key_code == 3
-#define Is_SaveKey(key_code) key_code == 19
-#define Is_LoadKey(key_code) key_code == 15
-
-
 string Int_To_Str(int number)
 {
 	string result = "";
@@ -64,34 +52,33 @@ void Update_Window(Window_Args& args)
 	SetConsoleCursorPosition(cons, Point2());
 	Point2 draw_pos;
 	bool is_selection_color = false;
-	for (int y = 0; y < args.Size.Y; y++)
-	{
-		for (int x = 0; x < args.Size.X; x++)
-		{ 
-			if (y == 0 || y == args.Size.Y - 1)
-				cout << '-';
-			else if (x == 0 || x == args.Size.X - 1)
-				cout << '|';
-			else
-				cout << ' ';
-		}
-		cout << "\n";
-	}
 
-	if (args.parts_count == 0)
-		args.part_selecting = true;
-	else
-	{
-		Draw_Parts(args);
-	}
 	if (args.connector_selecting)
 	{
-		Point2 con_point = *args.cursor_pos + Point2(0, args.Scroll);
-		if (con_point.X > 0 && con_point.X < args.Size.X - 1 &&
-			con_point.Y > 0 && con_point.Y < args.Size.Y - 1)
-			SetConsoleCursorPosition(cons, *args.cursor_pos + Point2(0, args.Scroll));
+		if (args.parts_count == 0)
+			args.part_selecting = true;
+		else
+		{
+			for (int y = 0; y < args.Size.Y; y++)
+			{
+				for (int x = 0; x < args.Size.X; x++)
+				{
+					if (y == 0 || y == args.Size.Y - 1)
+						cout << '-';
+					else if (x == 0 || x == args.Size.X - 1)
+						cout << '|';
+					else
+						cout << ' ';
+				}
+				cout << "\n";
+			}
+			Draw_Parts(args);
+		}
+		args.Move_Cursor();
+		return;
 	}
-	else if (args.part_selecting)
+
+	if (args.part_selecting)
 	{
 		Window_Args::Window_Parts_Panel_Args panel_args = args.Parts_Panel_Args;
 		draw_pos = Point2(panel_args.parts_padding+1, panel_args.parts_padding);
@@ -100,18 +87,23 @@ void Update_Window(Window_Args& args)
 		SetConsoleCursorPosition(cons, draw_pos);
 		for (int y = 0; y < panel_args.part_window_size.Y; y++)
 		{
-			for (int x = 0; x < panel_args.part_window_size.X; x++)
+			for (int x = 0; x < panel_args.part_window_size.X+1; x++)
 			{
-				if (y == 0 || y == panel_args.part_window_size.Y - 1)
-					cout << '-';
-				else if (x == 0 || x == panel_args.part_window_size.X - 1)
-					cout << '|';
-				else
+				if (x == panel_args.part_window_size.X)
+				{
 					cout << ' ';
+					continue;
+				}
+				char c = ' ';
+				if (y == 0 || y == panel_args.part_window_size.Y - 1)
+					c = '-';
+				else if (x == 0 || x == panel_args.part_window_size.X - 1)
+					c = '|';
+				cout << c;
 			}
 			SetConsoleCursorPosition(cons, Point2(draw_pos.X, draw_pos.Y+y+1));
 		}
-		draw_pos = draw_pos + Point2(1, 1);
+		draw_pos = draw_pos + Point2(2, 1);
 
 		// Draw panel Head
 		SetConsoleCursorPosition(cons, draw_pos);
@@ -120,7 +112,7 @@ void Update_Window(Window_Args& args)
 		SetConsoleCursorPosition(cons, draw_pos);
 		cout << " (Сраница " << panel_args.page + 1 << " из " << panel_args.pages_count << ')';
 		draw_pos.Y++;
-		SetConsoleCursorPosition(cons, draw_pos-Point2(1));
+		SetConsoleCursorPosition(cons, draw_pos-Point2(2));
 		for (int x = 0; x < panel_args.part_window_size.X; x++)
 			cout << '-';
 
@@ -158,7 +150,7 @@ void Update_Window(Window_Args& args)
 				cout << '|';
 
 				// Try draw part`s row
-				int row = y - padding.Y;
+				int row = y - padding.Y-1;
 				if (row >= 0 && row < panel_args.Parts[i].Size.Y && i < panel_args.parts_count)
 				{
 					SetConsoleCursorPosition(cons, Point2(draw_pos.X + padding.X + panel_args.parts_padding-1, draw_pos.Y));
@@ -298,22 +290,60 @@ PWSTR OpenFile_Dialoge()
 	return pszFilePath;
 }
 
+#define Is_UpKey(key_code) key_code == 72 || key_code == 119 || key_code == 56 || key_code == -26
+#define Is_LeftKey(key_code) key_code == 75 || key_code == 97 || key_code == 52 || key_code == -28
+#define Is_DownKey(key_code) key_code == 80 || key_code == 115 || key_code == 50 || key_code == -21
+#define Is_RightKey(key_code) key_code == 77 || key_code == 100 || key_code == 54 || key_code == -94
+#define Is_AcceptKey(key_code) key_code == 13 || key_code == 32 || key_code == 53
+#define Is_CancelKey(key_code) key_code == 27 ||  key_code == 8
+#define Is_DeleteKey(key_code) key_code == 83 ||  key_code == 120 ||  key_code == -25
+#define Is_CopyKey(key_code) key_code == 3
+#define Is_SaveKey(key_code) key_code == 19
+#define Is_LoadKey(key_code) key_code == 15
+//#define DEBUG
+
 int main()
 {
 	setlocale(LC_ALL, "rus");
-	Window_Args args;
+	Window_Args args{&cons};
 	Point2 debug_point = Point2(0, args.Size.Y + 1);
 	CONSOLE_SCREEN_BUFFER_INFO old;
 	PWSTR file_path = PWSTR();
+
+	for (int y = 0; y < args.Size.Y; y++)
+	{
+		for (int x = 0; x < args.Size.X; x++)
+		{
+			if (y == 0 || y == args.Size.Y - 1)
+				cout << '-';
+			else if (x == 0 || x == args.Size.X - 1)
+				cout << '|';
+			else
+				cout << ' ';
+		}
+		cout << "\n";
+	}
 
 	while (true)
 	{
 		if (args.update)
 		{
-			SetConsoleWindowInfo(cons, TRUE, args.Size);
 			Update_Window(args);
+			SetConsoleWindowInfo(cons, TRUE, args.Size);
 		}
 		char c = _getch();
+		if (c == -32)
+			c = _getch();
+
+#ifdef DEBUG
+		GetConsoleScreenBufferInfo(cons, &old);
+		SetConsoleCursorPosition(cons, debug_point);
+		cout << (int)c << ' ' << c << '\0';
+		SetConsoleCursorPosition(cons, old.dwCursorPosition);
+		SetConsoleWindowInfo(cons, TRUE, args.Size);
+#endif // DEBUG
+
+
 		if (Is_UpKey(c))
 		{
 			args.On_Key_UP();
@@ -345,7 +375,7 @@ int main()
 		else if (Is_CopyKey(c))
 		{
 			if (args.parts_count == 0)
-				MessageBoxW(NULL, L"Нечего сохранять", L"Сбой", MB_ICONASTERISK);
+				MessageBoxW(NULL, L"Нечего сохранять", L"Предупреждение", MB_ICONEXCLAMATION);
 			else if (OpenClipboard(NULL))
 			{
 				// Remove the current Clipboard contents
@@ -411,7 +441,10 @@ int main()
 						GlobalFree(hGlob);
 					}
 					else
+					{
 						CloseClipboard();
+						MessageBoxW(NULL, L"Скопировано в буффер обмена", L"Информация", MB_ICONINFORMATION);
+					}
 				}
 			}
 			
@@ -420,13 +453,13 @@ int main()
 		{
 			if (args.parts_count == 0)
 			{
-				MessageBoxW(NULL, L"Сохранять нечего!", L"Сбой", MB_ICONWARNING);
+				MessageBoxW(NULL, L"Сохронять нечего!", L"Предупреждение", MB_ICONEXCLAMATION);
 			}
 			else
 			{
 				file_path = SaveFile_Dialoge();
 				if (file_path == NULL)
-					MessageBoxW(NULL, L"Вы не выбрали файл!", L"Сбой", MB_ICONWARNING);
+					MessageBoxW(NULL, L"Вы не выбрали файл!", L"Предупреждение", MB_ICONEXCLAMATION);
 				else
 				{
 					FILE* f = NULL;
@@ -455,7 +488,7 @@ int main()
 						}
 					}
 					fclose(f);
-					MessageBoxW(NULL, L"Сохранение прошло успешно", L"Сохранено", MB_OK);
+					MessageBoxW(NULL, L"Успешно сохранено.", L"Информация", MB_ICONINFORMATION);
 				}
 			}
 		}
@@ -463,7 +496,7 @@ int main()
 		{
 			file_path = OpenFile_Dialoge();
 			if (file_path == NULL)
-				MessageBoxW(NULL, L"Вы не выбрали файл!", L"Сбой", MB_ICONWARNING);
+				MessageBoxW(NULL, L"Вы не выбрали файл!", L"Предупреждение", MB_ICONEXCLAMATION);
 			else
 			{
 				FILE* f = NULL;
@@ -498,13 +531,9 @@ int main()
 				args.part_selecting = false;
 				args.Reset();
 				fclose(f);
-				MessageBoxW(NULL, L"Загрузка данных прошла успешно", L"Загружено", MB_OK);
+				MessageBoxW(NULL, L"Загрузка данных прошла успешно.", L"Информация", MB_ICONINFORMATION);
 			}
 		}
-		GetConsoleScreenBufferInfo(cons, &old);
-		SetConsoleCursorPosition(cons, debug_point);
-		cout << (int)c << ' ' << c << '\0';
-		SetConsoleCursorPosition(cons, old.dwCursorPosition);
 	}
 	return 0;
 }

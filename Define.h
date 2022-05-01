@@ -34,3 +34,11 @@ enum class Part_Type;
 //#include "Part.h"
 //#include "PartConnector.h"
 //#endif // !MODULES_H
+
+/* Сообщения
+
+	MessageBoxW(NULL, L"Текст", L"Ошибка", MB_ICONERROR);
+	MessageBoxW(NULL, L"Текст", L"Предупреждение", MB_ICONEXCLAMATION);
+	MessageBoxW(NULL, L"Текст", L"Информация", MB_ICONINFORMATION);
+	MessageBoxW(NULL, L"Текст", L"Вопрос", MB_ICONQUESTION);
+*/
