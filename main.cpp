@@ -206,18 +206,13 @@ PWSTR SaveFile_Dialoge()
 	if (SUCCEEDED(hr))
 	{
 		IFileSaveDialog* pFileOpen;
-
-		// Create the FileOpenDialog object.
 		hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
 			IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileOpen));
 
 		if (SUCCEEDED(hr))
 		{
 			pFileOpen->SetFileTypes(_countof(FileTypes), FileTypes);
-			// Show the Open dialog box.
 			hr = pFileOpen->Show(NULL);
-
-			// Get the file name from the dialog box.
 			if (SUCCEEDED(hr))
 			{
 				IShellItem* pItem;
@@ -225,8 +220,6 @@ PWSTR SaveFile_Dialoge()
 				if (SUCCEEDED(hr))
 				{
 					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-					// Display the file name to the user.
 					if (SUCCEEDED(hr))
 					{
 						success = true;
