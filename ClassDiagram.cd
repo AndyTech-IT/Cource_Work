@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Struct Name="Window_Args">
+    <Position X="0.5" Y="2" Width="3.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="Window_Args::Window_Parts_Panel_Args">
+        <TypeIdentifier>
+          <NewMemberFileName>Window_Args.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>CAIAiggAAQgAlABBAIAEAAEAAECEAAAAEAAgAAAEACQ=</HashCode>
+      <FileName>Window_Args.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Part">
+    <Position X="4.25" Y="2" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAIAQAgAAgAAAAAQAAAAAAAAAQAQEAAACIBAA=</HashCode>
+      <FileName>Part.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="PartConnector">
+    <Position X="4.25" Y="6.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAQAAgAAAAAAAAAAAAAAAAAAEABCAAAkA=</HashCode>
+      <FileName>PartConnector.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Point2">
+    <Position X="7.75" Y="6.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIIgAAAAAAAAQAAAAAAAAAAAAAgAAAAYAA=</HashCode>
+      <FileName>Point2.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Color">
+    <Position X="4.25" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAGAAAAAAAAAgAAAAAAAAAABAAAAAAgAAAAADAAAAA=</HashCode>
+      <FileName>Color.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Part_Type">
+    <Position X="6" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABCAAAAAAAAAEAAAAAAAAQAAAAABAABAAQAGEAAAA=</HashCode>
+      <FileName>Part.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

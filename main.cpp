@@ -6,7 +6,7 @@
 #include "Window_Args.h"
 
 HANDLE cons = GetStdHandle(STD_OUTPUT_HANDLE);
-
+/*
 string Int_To_Str(int number)
 {
 	string result = "";
@@ -23,7 +23,7 @@ string Int_To_Str(int number)
 		}
 	}
 }
-
+*/
 void Draw_Parts(Window_Args args)
 {
 	for (Part* p = &args.parts[0]; p < &args.parts[args.parts_count]; p++)
@@ -249,23 +249,16 @@ PWSTR OpenFile_Dialoge()
 		{ L"ASCII Ships data", L"*.asdat" },
 		{ L"All files", L"*.*" }
 	};
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-		COINIT_DISABLE_OLE1DDE);
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 	if (SUCCEEDED(hr))
 	{
 		IFileOpenDialog* pFileOpen;
-
-		// Create the FileOpenDialog object.
 		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
 			IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
-
 		if (SUCCEEDED(hr))
 		{
 			pFileOpen->SetFileTypes(_countof(FileTypes), FileTypes);
-			// Show the Open dialog box.
 			hr = pFileOpen->Show(NULL);
-
-			// Get the file name from the dialog box.
 			if (SUCCEEDED(hr))
 			{
 				IShellItem* pItem;
@@ -273,8 +266,6 @@ PWSTR OpenFile_Dialoge()
 				if (SUCCEEDED(hr))
 				{
 					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-					// Display the file name to the user.
 					if (SUCCEEDED(hr))
 					{
 						success = true;
@@ -295,11 +286,13 @@ PWSTR OpenFile_Dialoge()
 #define Is_DownKey(key_code) key_code == 80 || key_code == 115 || key_code == 50 || key_code == -21
 #define Is_RightKey(key_code) key_code == 77 || key_code == 100 || key_code == 54 || key_code == -94
 #define Is_AcceptKey(key_code) key_code == 13 || key_code == 32 || key_code == 53
-#define Is_CancelKey(key_code) key_code == 27 ||  key_code == 8
+#define Is_CancelKey(key_code) key_code == 27
 #define Is_DeleteKey(key_code) key_code == 83 ||  key_code == 120 ||  key_code == -25
 #define Is_CopyKey(key_code) key_code == 3
 #define Is_SaveKey(key_code) key_code == 19
 #define Is_LoadKey(key_code) key_code == 15
+#define Is_ExitKey(key_code) key_code == 17
+#define Is_HelpKey(key_code) key_code == 60 || key_code == 8 ||  key_code == 9
 //#define DEBUG
 
 int main()
@@ -310,6 +303,7 @@ int main()
 	CONSOLE_SCREEN_BUFFER_INFO old;
 	PWSTR file_path = PWSTR();
 
+	cout << "Справка: 'F2' Ctrl + h, Ctrl + i" << endl;
 	for (int y = 0; y < args.Size.Y; y++)
 	{
 		for (int x = 0; x < args.Size.X; x++)
@@ -534,6 +528,9 @@ int main()
 				MessageBoxW(NULL, L"Загрузка данных прошла успешно.", L"Информация", MB_ICONINFORMATION);
 			}
 		}
+		else if (Is_HelpKey(c))
+			MessageBoxW(NULL, L"Добро пожаловать в редактор.\nУправление:\n WASD, Numpad, стрелочки - навигация\n Space, Enter, Num0 - Выполнить действие\n Delete - Удалить деталь с корабля\n Esc - отменить/на главную деталь\n Ctrl + c - Скопировать картинку в буфер обмена\n Ctrl + s - Сохранить данные в файл\n Ctrl + o - Загрузить данные из файла", L"Справочная Информация", MB_ICONQUESTION);
+		else if (Is_ExitKey(c))
+			return 0;
 	}
-	return 0;
 }
