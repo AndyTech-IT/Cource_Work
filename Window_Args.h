@@ -6,10 +6,10 @@
 
 struct Window_Args
 {
-	HANDLE* cons;
+	HANDLE& cons;
 	struct Window_Parts_Panel_Args
 	{
-		Window_Args* args = NULL;
+		Window_Args* args;
 		Point2 part_window_size;
 		int parts_count = 10;
 		int parts_padding = 1;
@@ -24,25 +24,41 @@ struct Window_Args
 		{
 			for (Part* p = &args->parts[0]; p < &args->parts[args->parts_count]; p++)
 			{
-				Point2 d_pos = target.Position - p->Position;
+				Point2 d_pos = target.Position - target.Center - p->Position + p->Center;
 				for (int y = 0; y < p->Size.Y; y++)
 				{
-					int y1 = d_pos.Y + y;
-					if (y1 >= 0 && y1 < target.Size.Y)
+					int y1 = y - d_pos.Y;
+					for (int x = 0; x < p->Size.X-1; x++)
 					{
-						for (int x = 0; x < p->Size.X - 1; x++)
+						int x1 = x - d_pos.X;
+						if (x1 >= 0 && x1 < target.Size.X - 1 && y1 >= 0 && y1 < target.Size.Y)
 						{
-							int x1 = d_pos.X + x;
-							if (x1 >= 0 && x1 < target.Size.X - 1)
-							{
-								if (p->Sprite[y][x] != ' ' && target.Sprite[y1][x1] != ' ')
-									return p;
-							}
+#						if DEBUG
+							SetConsoleTextAttribute(args->cons, (WORD)Color::Red);
+							SetConsoleCursorPosition(args->cons, p->Position + Point2(x + 1, y + 1) - p->Center);
+							if (p->Sprite[y][x] != '\0')
+								cout << p->Sprite[y][x];
+							else
+								cout << 0;
+							SetConsoleTextAttribute(args->cons, (WORD)Color::White);
+#						endif
+							return p;
 						}
+#						if DEBUG
+						else
+						{
+							SetConsoleTextAttribute(args->cons, (WORD)Color::Green);
+							SetConsoleCursorPosition(args->cons, p->Position + Point2(x + 1, y + 1) - p->Center);
+							if (p->Sprite[y][x] != '\0')
+								cout << p->Sprite[y][x];
+							else
+								cout << 0;
+							SetConsoleTextAttribute(args->cons, (WORD)Color::White);
+						}
+#						endif
 					}
 				}
 			}
-
 			return NULL;
 		}
 		void On_Key_UP()
@@ -99,6 +115,7 @@ struct Window_Args
 		}
 		void On_Key_Accept()
 		{
+			int index = selected_index;
 			page = 0;
 			selected_index = 0;
 			args->part_selecting = false;
@@ -107,7 +124,7 @@ struct Window_Args
 			if (args->parts_count == 0)
 			{
 				// Add main part in arr
-				args->parts = new Part[1]{ Get_Part((Part_Type)(selected_index + 1)) };
+				args->parts = new Part[1]{ Get_Part((Part_Type)(index + 1)) };
 				args->parts_count = 1;
 
 				// Add main part
@@ -122,7 +139,7 @@ struct Window_Args
 			}
 
 			// Create new part
-			Part* adding = new Part(Parts[selected_index]);
+			Part* adding = new Part(Parts[index]);
 			PartConnector* con = NULL;
 
 			// Finding of connection to new part
@@ -138,7 +155,9 @@ struct Window_Args
 			if (con == NULL)
 			{
 				MessageBoxW(NULL, L"Нельзя присоединить!", L"Ошибка", MB_ICONERROR);
-				args->update = false;
+				args->update = true;
+				args->part_selecting = true;
+				args->connector_selecting = false;
 				return;
 			}
 
@@ -146,7 +165,9 @@ struct Window_Args
 			if (Collide_With(adding) != NULL)
 			{
 				MessageBoxW(NULL, L"Пересечение с другой деталью!", L"Ошибка", MB_ICONERROR);
-				args->update = false;
+				args->update = true;
+				args->part_selecting = true;
+				args->connector_selecting = false;
 				return;
 			}
 
@@ -176,7 +197,7 @@ struct Window_Args
 	Window_Parts_Panel_Args Parts_Panel_Args{ this, Point2(25, Size.Y - 2) };
 
 	Part* parts = NULL;
-	int parts_count = 0;
+	USHORT parts_count = 0;
 
 	Part* selected_part = NULL;
 	int selected_con_index = 0;
@@ -187,7 +208,7 @@ struct Window_Args
 		Point2 con_point = *cursor_pos + Point2(0, Scroll);
 		if (con_point.X > 0 && con_point.X < Size.X - 1 &&
 			con_point.Y > 0 && con_point.Y < Size.Y - 1)
-			SetConsoleCursorPosition(*cons, *cursor_pos + Point2(0, Scroll));
+			SetConsoleCursorPosition(cons, *cursor_pos + Point2(0, Scroll));
 	}
 	void Reset()
 	{
@@ -205,11 +226,16 @@ struct Window_Args
 		{
 			connector_selecting = true;
 			part_selecting = false;
+			update = true;
+			Parts_Panel_Args.selected_index = 0;
+			Parts_Panel_Args.page = 0;
 			return;
 		}
 		if (connector_selecting)
 		{
+			update = false;
 			Reset();
+			Move_Cursor();
 		}
 	}
 	void On_Key_Delete()

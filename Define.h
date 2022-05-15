@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef LIBS_H
-
 #include <Windows.h>
 #include <cstdio>
 #include <chrono>
@@ -13,10 +11,7 @@
 #include <shobjidl.h> 
 using namespace std;
 
-#endif
-
-#ifndef CLASSES_H
-#define CLASSES_H
+#define DEBUG false
 
 struct Point2;
 enum class Color;
@@ -24,8 +19,6 @@ struct Part;
 struct PartConnector; 
 struct Window_Args;
 enum class Part_Type;
-
-#endif
 
 //#ifndef MODULES_H
 //#define MODULES_H

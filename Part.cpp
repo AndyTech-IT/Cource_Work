@@ -133,10 +133,10 @@ Part* Get_Cone_M()
 	const Point2 size = Point2(12, 5);
 	char** sprite = new char* [5]
 	{
-		new char[12] {R"(    /|\  )"},
-		new char[12] {R"(   />|<\ )"},
-		new char[12] {R"(  />/|\<\)"},
-		new char[12] {R"( />/>|<\<\)"},
+		new char[12] {R"(    /|\    )"},
+		new char[12] {R"(   />|<\   )"},
+		new char[12] {R"(  />/|\<\  )"},
+		new char[12] {R"( />/>|<\<\ )"},
 		new char[12] {R"(/>/>/|\<\<\)"},
 	};
 	int con_count = 1;

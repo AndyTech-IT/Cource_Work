@@ -1,38 +1,15 @@
 #include "Define.h"
-
 #include "Point2.h"
 #include "Part.h"
 #include "Color.h"
 #include "Window_Args.h"
 
 HANDLE cons = GetStdHandle(STD_OUTPUT_HANDLE);
-/*
-string Int_To_Str(int number)
-{
-	string result = "";
-	while (true)
-	{
-		int num = number % 10;
-		number = number / 10;
-		result = (char)('0' + num) + result;
-		if (number / 10 == 0)
-		{
-			if (number != 0)
-				result = (char)('0' + number) + result;
-			return result;
-		}
-	}
-}
-*/
 void Draw_Parts(Window_Args args)
 {
 	for (Part* p = &args.parts[0]; p < &args.parts[args.parts_count]; p++)
 	{
 		Point2 draw_pos = p->Position - p->Center + Point2(1, args.Scroll + 1);
-		if (draw_pos.X < 0 || draw_pos.X + p->Size.X > args.Size.X)
-		{
-			continue;
-		}
 		for (int y = 0; y < p->Size.Y; y++)
 		{
 			if (draw_pos.Y < 0 + 1 || draw_pos.Y > args.Size.Y - 2)
@@ -40,8 +17,15 @@ void Draw_Parts(Window_Args args)
 				draw_pos.Y++;
 				continue;
 			}
-			SetConsoleCursorPosition(cons, draw_pos);
-			cout << p->Sprite[y];
+			for (int x = 0; x < p->Size.X - 1; x++)
+			{
+				if (draw_pos.X + x < 1 || draw_pos.X + x > args.Size.X - 2)
+				{
+					continue;
+				}
+				SetConsoleCursorPosition(cons, draw_pos + Point2(x));
+				cout << p->Sprite[y][x];
+			}
 			draw_pos.Y++;
 		}
 	}
@@ -52,7 +36,6 @@ void Update_Window(Window_Args& args)
 	SetConsoleCursorPosition(cons, Point2());
 	Point2 draw_pos;
 	bool is_selection_color = false;
-
 	if (args.connector_selecting)
 	{
 		if (args.parts_count == 0)
@@ -192,10 +175,11 @@ string convertWstringToAstringWinapi(const  std::wstring& src)   throw (std::run
 
 		return std::string(temp);
 	}
+	return "";
 }
 PWSTR SaveFile_Dialoge()
 {
-	PWSTR pszFilePath = NULL;
+	PWSTR pszFilePath = PWSTR();
 	bool success = false;
 	COMDLG_FILTERSPEC FileTypes[] = {
 		{ L"ASCII Ships data", L"*.asdat" },
@@ -232,11 +216,11 @@ PWSTR SaveFile_Dialoge()
 		}
 		CoUninitialize();
 	}
-	return pszFilePath;
+	return success ? pszFilePath : NULL;
 }
 PWSTR OpenFile_Dialoge()
 {
-	PWSTR pszFilePath = NULL;
+	PWSTR pszFilePath = PWSTR();
 	bool success = false;
 	COMDLG_FILTERSPEC FileTypes[] = {
 		{ L"ASCII Ships data", L"*.asdat" },
@@ -271,7 +255,7 @@ PWSTR OpenFile_Dialoge()
 		}
 		CoUninitialize();
 	}
-	return pszFilePath;
+	return success ? pszFilePath : NULL;
 }
 
 #define Is_UpKey(key_code) key_code == 72 || key_code == 119 || key_code == 56 || key_code == -26
@@ -286,14 +270,12 @@ PWSTR OpenFile_Dialoge()
 #define Is_LoadKey(key_code) key_code == 15
 #define Is_ExitKey(key_code) key_code == 17
 #define Is_HelpKey(key_code) key_code == 60 || key_code == 8 ||  key_code == 9
-//#define DEBUG
 
 int main()
 {
 	setlocale(LC_ALL, "rus");
-	Window_Args args{&cons};
+	Window_Args args{ cons };
 	Point2 debug_point = Point2(0, args.Size.Y + 1);
-	CONSOLE_SCREEN_BUFFER_INFO old;
 	PWSTR file_path = PWSTR();
 
 	cout << "Справка: 'F2' Ctrl + h, Ctrl + i" << endl;
@@ -321,15 +303,6 @@ int main()
 		char c = _getch();
 		if (c == -32)
 			c = _getch();
-
-#ifdef DEBUG
-		GetConsoleScreenBufferInfo(cons, &old);
-		SetConsoleCursorPosition(cons, debug_point);
-		cout << (int)c << ' ' << c << '\0';
-		SetConsoleCursorPosition(cons, old.dwCursorPosition);
-		SetConsoleWindowInfo(cons, TRUE, args.Size);
-#endif // DEBUG
-
 
 		if (Is_UpKey(c))
 		{

@@ -14,8 +14,8 @@ struct Point2
 	}
 	operator const SMALL_RECT*()
 	{
-		const SMALL_RECT result = SMALL_RECT{ 0, 0, (short)X, (short)Y };
-		return &result;
+		const SMALL_RECT* result = new SMALL_RECT{ 0, 0, (short)X, (short)Y };
+		return result;
 	}
 	Point2 operator +(Point2 value);
 	Point2 operator -(Point2 value);
